@@ -1,5 +1,3 @@
-# vg-parking-challenge
-The Ultimate Váci Greens Parking Challenge
+# The Ultimate Emergency Room Challenge
 
-https://github.build.ge.com/pages/212637569/vg-parking-challenge/
-"# emergency-room-challenge" 
+https://elcsiga.github.io/emergency-room-challenge/.

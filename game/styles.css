@@ -1,0 +1,93 @@
+body {
+    --car-width: 40px;
+    --car-height: 30px;
+
+    font-family: 'Josefin Slab', serif;
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
+    background-color: white;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    border: 0;
+    margin: 0;
+}
+
+#board {
+    width: calc( var(--car-width) * 20 );
+    height: calc( var(--car-height) * 16 );
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    background: url("background/background.png");
+    background-size: cover;
+}
+
+#board > img {
+    position: absolute;
+    width: var(--car-width);
+    height: var(--car-width);
+    transition: all .3s;
+}
+h1 {
+    margin-top: 80px;
+}
+button {
+    width: 60px;
+    height: 60px;
+    border: 3px solid black;
+    border-radius: 30px;
+    outline: 0;
+    background-color: white;
+    margin: 10px;
+    font-size: 25px;
+}
+button:disabled {
+    background-color: lightgray;
+}
+#scores {
+    margin-bottom: 100px;
+}
+#scores span {
+    font-weight: bold;
+}
+section {
+    width: 600px;
+    margin: 10px;
+    padding: 10px;
+    text-align: left;
+}
+section ul {
+    margin: 50px 0;
+}
+section .car {
+    width: 60px;
+    vertical-align: bottom;
+}
+section .legend1, section .legend2 {
+    float: right;
+    margin: 30px 10px 10px 10px;
+}
+section .legend1 {
+    width: 40%;
+}
+section .legend2 {
+    width: 60%;
+}
+#progress {
+	display: none;
+	position: fixed;
+	width: 100vw;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	background-color: rgba(0,0,0,.8);
+	color: white;
+	text-align: center;
+	line-height: 100vh;
+	font-size: 40px;
+}

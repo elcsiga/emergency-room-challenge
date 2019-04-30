@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="game/styles.css">
+        <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:400,700" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+        <title>The Ultimate Váci Greens Parking Challenge</title>
+    </head>
+    <body>
+        <h1>The Ultimate Váci Greens Parking Challenge</h1>
+        <div id="board"></div>
+
+        <div>
+            <button id="slow-run"> <i class="fas fa-angle-right"></i> </button>
+            <button id="fast-run"> <i class="fas fa-angle-double-right"></i> </button>
+            <button id="instant-run"> <i class="fas fa-step-forward"></i> </button>
+            <button id="pause"> <i class="fas fa-pause"></i> </button>
+            <button id="reset"> <i class="fas fa-step-backward"></i> </button>
+            <button id="average"> <i class="fas fa-chart-line"></i> </button>
+        </div>
+
+        <div id="scores">
+            <b>SCORE <span id="rounds"></span>:</b>
+            Managers: <span id="score1"></span> -
+            Disableds: <span id="score2"></span> -
+            Employees: <span id="score3"></span> -
+            Total: <span id="totalScore"></span>
+        </div>
+
+        <section>
+            <h2>TL;DR</h2>
+            <p>
+                Write Javascript code to manage parking at the Váci Greens.
+            </p>
+        </section>
+
+        <section>
+            <h2>Rules</h2>
+            <p>
+                You are the Staff Executive Parking Manager at Váci Greens.
+                Every morning <b>100 cars arrive</b>, you have to redirect them
+                into one of the 3 parking lots with 30-30-30 parking spaces.
+            </p>
+            <p>
+                <img class="legend1" src="game/background/legend-manager.png">
+                <img class="car" src="game/cars/manager.png"> 20 of them are <b>managers</b>.
+                Every manager who gets into the <b>upper floor
+                of the underground garage</b> means <b>10 points</b> for you.
+                You do not receive points for parking on an other floor
+                or overground.
+            </p>
+            <p>
+                <img class="legend2" src="game/background/legend-disabled.png">
+                <img class="car" src="game/cars/disabled.png"> 30 of them are <b>disabled</b>.
+                They prefer parking spaces <b>near the entrance
+                in the overground parking lots</b>.
+                You can receive <b>1 to 10 points</b>, 10 points for the first,
+                1 point for the 10th parking place, in the order of arrivals.
+                If they have to park farther or underground,
+                you do not receive points.
+            </p>
+            <p>
+                <img class="car" src="game/cars/employee.png"> The rest, <b>employees</b>.
+                are simple: you gain <b>2 points</b> for each of them
+                who can park in any place.
+            </p>
+
+            <ul>
+                <li>
+                    Write plain Javascript (ES6) code,
+                    do not use any framework or library.
+                </li>
+                <li>
+                    Your code MUST always choose a parking lot for each car.
+                    If you send a car into a parking lot which is full,
+                    that car won't park, it will go away.
+                </li>
+                <li>
+                    Your code MUST never throw an error or exception.
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>How to play</h2>
+            <p>
+                Clone 
+                <a href=https://github.build.ge.com/212637569/vg-parking-challenge>
+                    <code>https://github.build.ge.com/212637569/vg-parking-challenge</code>
+                </a>.
+                Open <code>parkingManager.js</code> and write code.
+                Test your code by opening <code>index.html</code> in your browser.
+            </p>
+        </section>
+		
+		
+		<section>
+            <h2>The winners</h2>
+            <p>
+                ... of the challenge at GE Healthcare on 2018-05-24:
+            </p>
+            <ol>
+				<li><b>Komáromi Máté </b>- 306 points</li>
+				<li><b>Székely Dávid </b>- 303 points</li>
+				<li><b>Sziklai Oszkár </b>- 297 points</li>
+			</ol>	
+            <p>
+                You can find the solutions on branches of this repository.
+            </p>
+        </section>
+
+        <div id="progress"></div>
+				
+        <script src="parkingManager.js"></script>
+        <script src="game/index.js"></script>
+
+    </body>
+</html>
