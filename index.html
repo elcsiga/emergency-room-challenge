@@ -5,10 +5,10 @@
         <link rel="stylesheet" type="text/css" href="game/styles.css">
         <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:400,700" rel="stylesheet">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-        <title>The Ultimate Váci Greens Parking Challenge</title>
+        <title>The Ultimate Emergency Room Challenge</title>
     </head>
     <body>
-        <h1>The Ultimate Váci Greens Parking Challenge</h1>
+        <h1>The Ultimate Emergency Room Challenge</h1>
         <div id="board"></div>
 
         <div>
@@ -31,11 +31,27 @@
         <section>
             <h2>TL;DR</h2>
             <p>
-                Write Javascript code to manage parking at the Váci Greens.
+                Write Javascript code to manage the emergency room.
             </p>
         </section>
 
         <section>
+            <h2>Rules</h2>
+
+            <p>
+
+            </p>
+
+            <p>
+                <img class="legend2" src="game/background/legend-disabled.png">
+                <img class="car" src="game/rats/rat.png"> 30 of them are <b>infectious</b>.
+                You can call these patients into any rooms.
+
+                But be careful! An infectious patient will infect all other patient inside a room.
+                Each new infection.
+            </p>
+
+
             <h2>Rules</h2>
             <p>
                 You are the Staff Executive Parking Manager at Váci Greens.
@@ -44,7 +60,7 @@
             </p>
             <p>
                 <img class="legend1" src="game/background/legend-manager.png">
-                <img class="car" src="game/cars/manager.png"> 20 of them are <b>managers</b>.
+                <img class="car" src="game/rats/rat.png"> 20 of them are <b>managers</b>.
                 Every manager who gets into the <b>upper floor
                 of the underground garage</b> means <b>10 points</b> for you.
                 You do not receive points for parking on an other floor
@@ -52,7 +68,7 @@
             </p>
             <p>
                 <img class="legend2" src="game/background/legend-disabled.png">
-                <img class="car" src="game/cars/disabled.png"> 30 of them are <b>disabled</b>.
+                <img class="car" src="game/rats/rat.png"> 30 of them are <b>disabled</b>.
                 They prefer parking spaces <b>near the entrance
                 in the overground parking lots</b>.
                 You can receive <b>1 to 10 points</b>, 10 points for the first,
@@ -61,7 +77,7 @@
                 you do not receive points.
             </p>
             <p>
-                <img class="car" src="game/cars/employee.png"> The rest, <b>employees</b>.
+                <img class="car" src="game/rats/rat.png"> The rest, <b>employees</b>.
                 are simple: you gain <b>2 points</b> for each of them
                 who can park in any place.
             </p>
@@ -86,33 +102,32 @@
             <h2>How to play</h2>
             <p>
                 Clone 
-                <a href=https://github.build.ge.com/212637569/vg-parking-challenge>
-                    <code>https://github.build.ge.com/212637569/vg-parking-challenge</code>
+                <a href=https://github.com/elcsiga/emergency-room-challenge>
+                    <code>https://github.com/elcsiga/emergency-room-challenge</code>
                 </a>.
-                Open <code>parkingManager.js</code> and write code.
+                Open <code>ERManager.js</code> and write code.
                 Test your code by opening <code>index.html</code> in your browser.
             </p>
         </section>
 		
-		
+		<!--
 		<section>
             <h2>The winners</h2>
             <p>
-                ... of the challenge at GE Healthcare on 2018-05-24:
+                ... of the challenge at GE Healthcare on 2019-05-13:
             </p>
             <ol>
-				<li><b>Komáromi Máté </b>- 306 points</li>
-				<li><b>Székely Dávid </b>- 303 points</li>
-				<li><b>Sziklai Oszkár </b>- 297 points</li>
-			</ol>	
+				<li><b> ??? </b>- ??? points</li>
+			</ol>
             <p>
                 You can find the solutions on branches of this repository.
             </p>
         </section>
+        -->
 
         <div id="progress"></div>
 				
-        <script src="parkingManager.js"></script>
+        <script src="ERManager.js"></script>
         <script src="game/index.js"></script>
 
     </body>

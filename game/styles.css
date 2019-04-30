@@ -1,6 +1,6 @@
 body {
-    --car-width: 40px;
-    --car-height: 30px;
+    --rat-width: 40px;
+    --rat-height: 30px;
 
     font-family: 'Josefin Slab', serif;
     width: 100%;
@@ -18,8 +18,8 @@ body {
 }
 
 #board {
-    width: calc( var(--car-width) * 20 );
-    height: calc( var(--car-height) * 16 );
+    width: calc( var(--rat-width) * 20 );
+    height: calc( var(--rat-height) * 16 );
     background-color: white;
     position: relative;
     overflow: hidden;
@@ -29,8 +29,8 @@ body {
 
 #board > img {
     position: absolute;
-    width: var(--car-width);
-    height: var(--car-width);
+    width: var(--rat-width);
+    height: var(--rat-width);
     transition: all .3s;
 }
 h1 {

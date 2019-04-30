@@ -1,19 +1,19 @@
 
 
-(ParkingManager => {
+(ERManager => {
 
 	let SILENT_MODE = false;
 	
-    const CAR_WIDTH = parseInt(getComputedStyle(document.body).getPropertyValue('--car-width'));
-    const CAR_HEIGHT = parseInt(getComputedStyle(document.body).getPropertyValue('--car-height'));
+    const RAT_WIDTH = parseInt(getComputedStyle(document.body).getPropertyValue('--rat-width'));
+    const RAT_HEIGHT = parseInt(getComputedStyle(document.body).getPropertyValue('--rat-height'));
 
-    const CAR = {
+    const RAT = {
         MANAGER: 'manager',
         EMPLOYEE: 'employee',
         DISABLED: 'disabled'
     };
 
-    const PARKINGLOT = {
+    const ROOM = {
         UNDERGROUND_GARAGE: 'underground-garage',
         RENO_COURT: 'reno-court',
         OPEN_AREA: 'open-area'
@@ -27,19 +27,21 @@
         return this;
     };
 
-    class Car {
+    class Rat {
         constructor(type, index) {
             this.type = type;
+            this.illness = 3;
             this.index = index;
+            this.infected = false;
 			if (!SILENT_MODE) {
 				this.img = document.createElement("img");
-				this.img.src = `game/cars/${type}.png`;
+				this.img.src = `game/rats/rat.png`; // `game/rats/${type}.png`;
 				document.getElementById('board').appendChild(this.img);
 			}
         }
         setPos(pos) {
 			if (this.img) {
-				this.img.style.transform = `translate(${pos.x*CAR_WIDTH}px, ${pos.y*CAR_HEIGHT + 10}px)`;
+				this.img.style.transform = `translate(${pos.x*RAT_WIDTH}px, ${pos.y*RAT_HEIGHT + 10}px)`;
 			}
             return this;
         }
@@ -48,6 +50,12 @@
 				this.img.style.opacity = opacity;
 			}
             return this;
+        }
+        heal() {
+            this.illness--;
+        }
+        isIll() {
+            return this.illness > 0;
         }
         destroy() {
 			if (this.img) {
@@ -59,56 +67,101 @@
 
     class Street {
         constructor() {
-            const carTypes = new Array(100);
-            carTypes.fill(CAR.MANAGER, 0, 20);
-            carTypes.fill(CAR.EMPLOYEE, 20, 70);
-            carTypes.fill(CAR.DISABLED, 70, 100);
+            const ratTypes = new Array(100);
+            ratTypes.fill(RAT.MANAGER, 0, 20);
+            ratTypes.fill(RAT.EMPLOYEE, 20, 70);
+            ratTypes.fill(RAT.DISABLED, 70, 100);
 
-            this.cars = carTypes
+            this.rats = ratTypes
                 .shuffle()
-                .map((type, index) => new Car(type, index));
+                .map((type, index) => new Rat(type, index));
 
             this.update();
         }
         update() {
-            this.cars.forEach(( car, index ) => car
+            this.rats.forEach(( rat, index ) => rat
                 .setPos({x: -index+11, y: 5})
                 .setOpacity( Math.max(0, 1 - index/10) )
             );
         }
-        pickFirstCar() {
-            const car = this.cars.shift();
+        pickFirstRat() {
+            const rat = this.rats.shift();
             this.update();
-            return car;
+            return rat;
         }
         destroy() {
-            this.cars.forEach( car => car.destroy() );
+            this.rats.forEach( rat => rat.destroy() );
         }
     }
 
-    class ParkingLot {
-        constructor( capacity, positionStrategy ) {
-            this.cars = [];
-            this.capacity = capacity;
-            this.positionStrategy = positionStrategy;
+    class Hall {
+        constructor() {
+            this.capacity = 5;
+            this.rats = new Array(this.capacity).fill(null);
+            this.X = 1;
+            this.Y = 1;
         }
 
-        pushCar(car) {
-            const nextIndex = this.cars.length;
-            if (nextIndex < this.capacity) {
-                const nextPos = this.positionStrategy(nextIndex);
-                this.cars.push( car.setPos(nextPos) );
-                return true;
-            }
-            else {
-                return false;
+        pushRat(rat) {
+            const firstEmptyIndex = this.rats.findIndex(rat => rat === null);
+            if (rat && firstEmptyIndex >= 0) {
+                this.rats[firstEmptyIndex] = rat.setPos({x: this.X + firstEmptyIndex, y: this.Y});
             }
         }
-        getFreeCapacity() {
-            return this.capacity - this.cars.length;
+
+        pickRat(index) {
+            if (index > 0 && index < this.capacity) {
+                const pickedRat = this.rats[index];
+                this.rats[index] = null;
+                return pickedRat;
+            }
+            else return null;
         }
         destroy() {
-            this.cars.forEach( car => car.destroy() );
+            this.rats.forEach( rat => rat.destroy() );
+        }
+    }
+
+    class Room {
+        constructor( capacity, X, Y ) {
+            this.rats = [];
+            this.capacity = capacity;
+            this.X = X;
+            this.Y = Y;
+            this.numOfInfetcions = 0;
+        }
+
+        pushRat(rat) {
+            const firstEmptyIndex = this.rats.findIndex(rat => rat === null);
+            if (rat && firstEmptyIndex >= 0) {
+                this.rats[firstEmptyIndex] = rat.setPos({x: this.X + firstEmptyIndex, y: this.Y});
+            }
+        }
+
+        update() {
+            // infecting
+            const numOfInfetedRats = this.rats.reduce(( sum, rat ) => sum += (rat.infected ? 1 : 0));
+            if (numOfInfetedRats > 0) {
+                this.rats.forEach(rat => {
+                    if (!rat.infected) {
+                        rat.infected = true;
+                        this.numOfInfetcions ++;
+                    }
+                });
+            }
+
+            // healing
+            this.rats.forEach(( rat, index ) => {
+                rat.heal();
+                if (!rat.isIll()) {
+                    this.rats[index] = null;
+                    rat.destroy();
+                }
+            });
+        }
+
+        destroy() {
+            this.rats.forEach( rat => rat.destroy() );
         }
     }
 
@@ -122,18 +175,18 @@
             document.getElementById('average').onclick = () => this.calculateAverage(1000);
 			
             this.rules = [
-                () => this.parkingLots[PARKINGLOT.UNDERGROUND_GARAGE].cars
-                    .reduce((sum, car, position) => sum + (car.type === CAR.MANAGER && position >= 20 ? 10 : 0), 0),
-                () => this.parkingLots[PARKINGLOT.RENO_COURT].cars
-                        .reduce((sum, car, position) => sum + (car.type === CAR.DISABLED ? Math.max(10 - position, 0) : 0), 0)
-                    + this.parkingLots[PARKINGLOT.OPEN_AREA].cars
-                        .reduce((sum, car, position) => sum + (car.type === CAR.DISABLED ? Math.max(10 - position, 0) : 0), 0),
-                () => this.parkingLots[PARKINGLOT.UNDERGROUND_GARAGE].cars
-                        .reduce((sum, car) => sum + (car.type === CAR.EMPLOYEE ? 2 : 0), 0)
-                    + this.parkingLots[PARKINGLOT.RENO_COURT].cars
-                        .reduce((sum, car) => sum + (car.type === CAR.EMPLOYEE ? 2 : 0), 0)
-                    + this.parkingLots[PARKINGLOT.OPEN_AREA].cars
-                        .reduce((sum, car) => sum + (car.type === CAR.EMPLOYEE ? 2 : 0), 0)
+                () => this.rooms[ROOM.UNDERGROUND_GARAGE].rats
+                    .reduce((sum, rat, position) => sum + (rat.type === RAT.MANAGER && position >= 20 ? 10 : 0), 0),
+                () => this.rooms[ROOM.RENO_COURT].rats
+                        .reduce((sum, rat, position) => sum + (rat.type === RAT.DISABLED ? Math.max(10 - position, 0) : 0), 0)
+                    + this.rooms[ROOM.OPEN_AREA].rats
+                        .reduce((sum, rat, position) => sum + (rat.type === RAT.DISABLED ? Math.max(10 - position, 0) : 0), 0),
+                () => this.rooms[ROOM.UNDERGROUND_GARAGE].rats
+                        .reduce((sum, rat) => sum + (rat.type === RAT.EMPLOYEE ? 2 : 0), 0)
+                    + this.rooms[ROOM.RENO_COURT].rats
+                        .reduce((sum, rat) => sum + (rat.type === RAT.EMPLOYEE ? 2 : 0), 0)
+                    + this.rooms[ROOM.OPEN_AREA].rats
+                        .reduce((sum, rat) => sum + (rat.type === RAT.EMPLOYEE ? 2 : 0), 0)
             ];
 
             this.reset();
@@ -166,7 +219,6 @@
             if (stopped) {
                 this.doAStep();
             }
-            this.updateUI();
         }
 		calculateScores() {
 			return this.rules.map( rule => rule());
@@ -181,42 +233,42 @@
             document.getElementById('score3').innerHTML = numOfRounds ? parseFloat(scores[2]).toFixed(2) : scores[2];
             document.getElementById('totalScore').innerHTML = numOfRounds ? parseFloat(total).toFixed(2) : total;
 
-            const streetHasCars = this.street.cars.length > 0;
-            document.getElementById('slow-run').disabled = !streetHasCars;
-            document.getElementById('fast-run').disabled = !streetHasCars;
-            document.getElementById('instant-run').disabled = !streetHasCars;
-            document.getElementById('pause').disabled = !streetHasCars || this.speed === undefined;
-            document.getElementById('reset').disabled = this.street.cars.length === 100;
+            const streetHasRats = this.street.rats.length > 0;
+            document.getElementById('slow-run').disabled = !streetHasRats;
+            document.getElementById('fast-run').disabled = !streetHasRats;
+            document.getElementById('instant-run').disabled = !streetHasRats;
+            document.getElementById('pause').disabled = !streetHasRats || this.speed === undefined;
+            document.getElementById('reset').disabled = this.street.rats.length === 100;
         }
         reset() {
             if (this.street)
                 this.street.destroy();
-            if (this.parkingLots) {
-                for (let parkingLotId in this.parkingLots) {
-                    this.parkingLots[parkingLotId].destroy();
+            if (this.rooms) {
+                for (let roomId in this.rooms) {
+                    this.rooms[roomId].destroy();
                 }
             }
 
             this.street = new Street();
             try {
-                this.parkingManager = new ParkingManager();
+                this.erManager = new ERManager();
             } catch (e) {
-                console.error('Cannot create new ParkingManager', e);
+                console.error('Cannot create new ERManager', e);
             }
 
-            this.parkingLots = {
-                [PARKINGLOT.UNDERGROUND_GARAGE]:
-                    new ParkingLot( 30, (index) => ({
+            this.rooms = {
+                [ROOM.UNDERGROUND_GARAGE]:
+                    new Room( 30, (index) => ({
                         x: index % 10 + 1,
                         y: 13 - Math.floor(index / 10)
                     }) ),
-                [PARKINGLOT.RENO_COURT]:
-                    new ParkingLot( 30, (index) => ({
+                [ROOM.RENO_COURT]:
+                    new Room( 30, (index) => ({
                         x: Math.floor(index / 2) + 4,
                         y: index % 2 + 2
                     }) ),
-                [PARKINGLOT.OPEN_AREA]:
-                    new ParkingLot( 30, (index) => ({
+                [ROOM.OPEN_AREA]:
+                    new Room( 30, (index) => ({
                         x: index % 5 + 14 ,
                         y: Math.floor(index / 5) + 8
                     }) )
@@ -227,29 +279,29 @@
         }
         doAStep() {
             if ( SILENT_MODE || this.speed !== undefined) {
-                const nextCar = this.street.pickFirstCar();
-                if (nextCar) {
-                    let parkingLotId;
+                const nextRat = this.street.pickFirstRat();
+                if (nextRat) {
+                    let roomId;
                     try {
-                        parkingLotId = this.parkingManager.selectParkingLot(nextCar.type);
+                        roomId = this.erManager.selectRoom(nextRat.type);
 
-                        if (parkingLotId && this.parkingLots.hasOwnProperty(parkingLotId)) {
-                            if (this.parkingLots[parkingLotId].pushCar(nextCar)) {
+                        if (roomId && this.rooms.hasOwnProperty(roomId)) {
+                            if (this.rooms[roomId].pushRat(nextRat)) {
                                 // success
                             } else {
-                                nextCar.destroy();
+                                nextRat.destroy();
                             }
                             if (!SILENT_MODE && this.speed !== undefined) {
                                 setTimeout(() => this.doAStep(), this.speed);
                             }
                         } else {
-                            nextCar.destroy();
-                            console.error(`'${parkingLotId}' is not a valid parking lot id`);
+                            nextRat.destroy();
+                            console.error(`'${roomId}' is not a valid parking lot id`);
                             this.reset();
                         }
 
                     } catch (e) {
-                        console.error('selectParkingLot() crashed.', e);
+                        console.error('selectRoom() crashed.', e);
                         this.reset();
                     }
 					if (!SILENT_MODE) {
@@ -262,7 +314,7 @@
 
     new Game();
 
-})(ParkingManager);
+})(ERManager);
 
 
 
