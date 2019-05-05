@@ -1,6 +1,6 @@
 body {
-    --rat-width: 40px;
-    --rat-height: 30px;
+    --rat-width: 50px;
+    --rat-height: 50px;
 
     font-family: 'Josefin Slab', serif;
     width: 100%;
@@ -18,12 +18,12 @@ body {
 }
 
 #board {
-    width: calc( var(--rat-width) * 20 );
-    height: calc( var(--rat-height) * 16 );
-    background-color: white;
+    width: calc( var(--rat-width) * 14);
+    height: calc( var(--rat-height) * 8 );
+    background-color: grey;
     position: relative;
     overflow: hidden;
-    background: url("background/background.png");
+    background: url("background/bg.png");
     background-size: cover;
 }
 
@@ -45,8 +45,12 @@ button {
     background-color: white;
     margin: 10px;
     font-size: 25px;
+    cursor: pointer;
 }
 button:disabled {
+    background-color: lightgray;
+}
+button:hover {
     background-color: lightgray;
 }
 #scores {
@@ -56,7 +60,7 @@ button:disabled {
     font-weight: bold;
 }
 section {
-    width: 600px;
+    width: 700px;
     margin: 10px;
     padding: 10px;
     text-align: left;
