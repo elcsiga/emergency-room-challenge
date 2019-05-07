@@ -61,15 +61,22 @@
         }
 
         destroy() {
-            if (this.img) {
-                document.getElementById('board').removeChild(this.img);
-                this.img = null;
-            }
+            this.setOpacity(0);
+            setTimeout(
+                () => {
+                    if (this.img) {
+                        document.getElementById('board').removeChild(this.img);
+                        this.img = null;
+                    }
+                }, 300
+            )
         }
     }
 
     class Street {
         constructor(X, Y) {
+            this.X = X;
+            this.Y = Y;
             const ratTypes = new Array(100);
             ratTypes.fill(RAT.MANAGER, 0, 20);
             ratTypes.fill(RAT.EMPLOYEE, 20, 70);
@@ -81,15 +88,14 @@
 
             this.update();
 
-            this.X = X;
-            this.Y = Y;
+
 
         }
 
         update() {
             this.rats.forEach((rat, index) => rat
                 .setPos({x: -index + 11 + this.X, y: this.Y})
-                .setOpacity(Math.max(0, 1 - index / 10))
+                .setOpacity(Math.max(0, 1 - index / 6))
             );
         }
 
@@ -110,14 +116,18 @@
 
     class Hall {
         constructor(capacity, X, Y) {
-            this.capacity = capacity;
-            this.rats = new Array(capacity).fill(null);
             this.X = X;
             this.Y = Y;
+            this.capacity = capacity;
+            this.rats = new Array(capacity).fill(null);
+
         }
 
         isFull() {
             return this.rats.every(r => !!r);
+        }
+        isEmpty() {
+            return this.rats.every(r => !r);
         }
 
         pushRat(rat) {
@@ -128,7 +138,7 @@
         }
 
         hasRat(index) {
-            return index > 0 && index < this.capacity && !!this.rats[index];
+            return index >= 0 && index < this.capacity && !!this.rats[index];
         }
         pickRat(index) {
             if (this.hasRat(index)) {
@@ -155,6 +165,9 @@
         isFull() {
             return this.rats.every(r => !!r);
         }
+        isEmpty() {
+            return this.rats.every(r => !r);
+        }
 
         pushRat(rat) {
             const firstEmptyIndex = this.rats.findIndex(rat => rat === null);
@@ -168,12 +181,12 @@
 
         update() {
 
-            const rats = this.rats.filter( rat => !!rat);
+            const trueRats = this.rats.filter( rat => !!rat);
 
             // infecting
-            const numOfInfetedRats = rats.reduce((sum, rat) => sum += (rat.infected ? 1 : 0), 0);
+            const numOfInfetedRats = trueRats.reduce((sum, rat) => sum += (rat.infected ? 1 : 0), 0);
             if (numOfInfetedRats > 0) {
-                this.rats.forEach(rat => {
+                trueRats.forEach(rat => {
                     if (!rat.infected) {
                         rat.infected = true;
                         this.numOfInfetcions++;
@@ -182,11 +195,13 @@
             }
 
             // healing
-            rats.forEach((rat, index) => {
-                rat.heal();
-                if (!rat.isIll()) {
-                    this.rats[index] = null;
-                    rat.destroy();
+            this.rats.forEach((rat, index) => {
+                if (rat) {
+                    rat.heal();
+                    if (!rat.isIll()) {
+                        this.rats[index] = null;
+                        rat.destroy();
+                    }
                 }
             });
         }
@@ -199,13 +214,16 @@
     class Game {
         constructor() {
             document.getElementById('slow-run').onclick = () => this.run(800);
+            document.getElementById('step').onclick = () => this.doAStep(true);
             document.getElementById('fast-run').onclick = () => this.run(100);
             document.getElementById('instant-run').onclick = () => this.run(0);
             document.getElementById('pause').onclick = () => this.run(undefined);
             document.getElementById('reset').onclick = () => this.reset();
             document.getElementById('average').onclick = () => this.calculateAverage(1000);
 
-            this.rules = [ /*
+            this.rules = [
+                () => this.rooms.reduce((sum, room) => sum - room.numOfInfetcions, 0)
+                /*
                 () => this.rooms[ROOM.UNDERGROUND_GARAGE].rats
                     .reduce((sum, rat, position) => sum + (rat.type === RAT.MANAGER && position >= 20 ? 10 : 0), 0),
                 () => this.rooms[ROOM.RENO_COURT].rats
@@ -248,7 +266,7 @@
             ];
 
             this.speed = undefined;
-            this.updateUI([0, 0, 0]);
+            this.updateUI(true, [0, 0, 0]);
         }
 
         showProgress(label) {
@@ -263,15 +281,17 @@
                 const sumScores = [0, 0, 0];
                 for (let n = 0; n < numOfRounds; n++) {
                     this.reset();
-                    for (let m = 0; m < 100; m++) {
-                        this.doAStep(true);
-                    }
+                    let c;
+                    do {
+                        c = this.doAStep();
+                    } while (c);
+
                     const scores = this.calculateScores();
                     scores.forEach((score, index) => sumScores[index] += score);
                 }
                 const averageScores = sumScores.map(sum => sum / numOfRounds);
                 this.showProgress(false);
-                this.updateUI(averageScores, numOfRounds);
+                this.updateUI(false, averageScores, numOfRounds);
             }, 0);
         }
 
@@ -288,28 +308,28 @@
             return this.rules.map(rule => rule());
         }
 
-        updateUI(scores, numOfRounds) {
+        updateUI(doContinue, scores, numOfRounds) {
             const total = scores.reduce((sum, score) => sum + score, 0);
 
             document.getElementById('rounds').innerHTML = numOfRounds ? `(${numOfRounds} rounds)` : '';
 
             document.getElementById('score1').innerHTML = numOfRounds ? parseFloat(scores[0]).toFixed(2) : scores[0];
-            document.getElementById('score2').innerHTML = numOfRounds ? parseFloat(scores[1]).toFixed(2) : scores[1];
-            document.getElementById('score3').innerHTML = numOfRounds ? parseFloat(scores[2]).toFixed(2) : scores[2];
+            //document.getElementById('score2').innerHTML = numOfRounds ? parseFloat(scores[1]).toFixed(2) : scores[1];
+            //document.getElementById('score3').innerHTML = numOfRounds ? parseFloat(scores[2]).toFixed(2) : scores[2];
             document.getElementById('totalScore').innerHTML = numOfRounds ? parseFloat(total).toFixed(2) : total;
 
-            const streetHasRats = this.street.rats.length > 0;
-            document.getElementById('slow-run').disabled = !streetHasRats;
-            document.getElementById('fast-run').disabled = !streetHasRats;
-            document.getElementById('instant-run').disabled = !streetHasRats;
-            document.getElementById('pause').disabled = !streetHasRats || this.speed === undefined;
+            document.getElementById('slow-run').disabled = !doContinue;
+            document.getElementById('fast-run').disabled = !doContinue;
+            document.getElementById('instant-run').disabled = !doContinue;
+            document.getElementById('pause').disabled = !doContinue || this.speed === undefined;
             document.getElementById('reset').disabled = this.street.rats.length === 100;
         }
 
 
 
-        doAStep() {
-            if (SILENT_MODE || this.speed !== undefined) {
+        doAStep(force) {
+            let doContinue = false;
+            if (force || SILENT_MODE || this.speed !== undefined) {
                 try {
                     const result = this.erManager.redirectRatToRoom();
 
@@ -319,21 +339,9 @@
 
                         console.log(`Redirecting rat #${result.rat} to room #${result.room}`);
 
-                        // STREET -> HALL
+                        // ROOM -> OUT
 
-                        {
-
-
-                            if (this.street.isEmpty()) {
-                                console.log(`No more rat in the street!`);
-                            }
-                            else if (this.hall.isFull()) {
-                                console.log(`Hall is full!`);
-                            } else {
-                                const rat = this.street.pickRat();
-                                this.hall.pushRat(rat);
-                            }
-                        }
+                        this.rooms.forEach(room => room.update());
 
                         // HALL -> ROOM
 
@@ -352,32 +360,46 @@
                             }
                         }
 
-                        // ROOM -> OUT
+                        // STREET -> HALL
 
-                        this.rooms.forEach(room => room.update());
+                        {
+                            if (this.street.isEmpty()) {
+                                console.log(`No more rat in the street!`);
+                            }
+                            else if (this.hall.isFull()) {
+                                console.log(`Hall is full!`);
+                            } else {
+                                const rat = this.street.pickRat();
+                                this.hall.pushRat(rat);
+                            }
+                        }
 
                         // NEXT STEP
+                        const empty = this.street.isEmpty() && this.hall.isEmpty()
+                            && this.rooms.every(room => room.isEmpty());
 
-                        if (!SILENT_MODE && this.speed !== undefined) {
+                        doContinue = !empty;
+
+                        if (!SILENT_MODE && doContinue && this.speed !== undefined) {
                             setTimeout(() => this.doAStep(), this.speed);
                         }
-                    } else if (result === null) {
-                        console.log('Skipping a step');
+                        if (!SILENT_MODE && !doContinue) {
+                            this.speed = undefined;
+                        }
                     } else {
                         console.error(`${result} is not a valid response`);
                         this.reset();
                     }
-
 
                 } catch (e) {
                     console.error('erManager.redirectRatToRoom() crashed.', e);
                     this.reset();
                 }
                 if (!SILENT_MODE) {
-                    this.updateUI(this.calculateScores());
+                    this.updateUI(doContinue, this.calculateScores());
                 }
             }
-
+            return doContinue;
         }
     }
 

@@ -29,6 +29,7 @@ body {
 
 #board > img {
     position: absolute;
+    opacity: 0;
     width: var(--rat-width);
     height: var(--rat-width);
     transition: all .3s;
