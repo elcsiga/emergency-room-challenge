@@ -11,12 +11,6 @@
         DISABLED: 'disabled'
     };
 
-    const ROOM = {
-        UNDERGROUND_GARAGE: 'underground-garage',
-        RENO_COURT: 'reno-court',
-        OPEN_AREA: 'open-area'
-    };
-
     Array.prototype.shuffle = function () {
         for (let i = this.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -28,9 +22,9 @@
     class Rat {
         constructor(type, index) {
             this.type = type;
-            this.illness = 3;
             this.index = index;
             this.infected = false;
+            this.triage = 3;
             if (!SILENT_MODE) {
                 this.img = document.createElement("img");
                 this.img.src = `game/rats/rat.png`; // `game/rats/${type}.png`;
@@ -52,24 +46,25 @@
             return this;
         }
 
-        heal() {
-            this.illness--;
-        }
-
-        isIll() {
-            return this.illness > 0;
+        die() {
+            if (this.img) {
+                this.img.src = `game/rats/rat_dead.png`;
+            }
+            this.destroy();
         }
 
         destroy() {
             this.setOpacity(0);
-            setTimeout(
-                () => {
-                    if (this.img) {
-                        document.getElementById('board').removeChild(this.img);
-                        this.img = null;
-                    }
-                }, 300
-            )
+            if (this.img) {
+                setTimeout(
+                    () => {
+                        if (this.img) {
+                            document.getElementById('board').removeChild(this.img);
+                            this.img = null;
+                        }
+                    }, 1000
+                )
+            }
         }
     }
 
@@ -87,9 +82,6 @@
                 .map((type, index) => new Rat(type, index));
 
             this.update();
-
-
-
         }
 
         update() {
@@ -120,7 +112,23 @@
             this.Y = Y;
             this.capacity = capacity;
             this.rats = new Array(capacity).fill(null);
+            this.numOfDeaths = 0;
 
+            if (!SILENT_MODE) {
+
+                new Array(capacity)
+                    .fill(true)
+                    .map( () => document.createElement("div"))
+                    .forEach( (div, index) => {
+                        div.style.height = '10px';
+                        div.style.width = '10px';
+                        div.style.backgroundColor = 'red';
+                        div.style.transform = `translate(${pos.x * RAT_WIDTH}px, ${pos.y * RAT_HEIGHT + 10}px)`;
+                        document.getElementById('board').appendChild(this.img);
+
+                    });
+
+            }
         }
 
         isFull() {
@@ -130,10 +138,28 @@
             return this.rats.every(r => !r);
         }
 
+        update() {
+            this.rats.forEach( (rat, index) => {
+               if (rat) {
+                   rat.triage--;
+                   if (rat.triage <= 0) {
+                       rat.die();
+                       this.numOfDeaths++;
+                       this.rats[index] = null;
+                       console.log(`Rat #${index+1} died`);
+                   }
+               }
+            });
+        }
+
         pushRat(rat) {
-            const firstEmptyIndex = this.rats.findIndex(rat => rat === null);
-            if (rat && firstEmptyIndex >= 0) {
-                this.rats[firstEmptyIndex] = rat.setPos({x: this.X + firstEmptyIndex, y: this.Y});
+            const freeIndexes = this.rats
+                .map( (rat, index) => rat ? -1 : index)
+                .filter(index => index >= 0);
+
+            if (rat && freeIndexes.length) {
+                const index = freeIndexes[ Math.floor( Math.random() * freeIndexes.length)];
+                this.rats[index] = rat.setPos({x: this.X + index, y: this.Y});
             }
         }
 
@@ -153,26 +179,25 @@
         }
     }
 
-    class Room {
-        constructor(capacity, X, Y) {
-            this.capacity = capacity;
-            this.rats = new Array(capacity).fill(null);
+    class Surgery {
+        constructor(X, Y) {
+            this.rat = null;
+            this.timer = 0;
             this.X = X;
             this.Y = Y;
-            this.numOfInfetcions = 0;
         }
 
         isFull() {
-            return this.rats.every(r => !!r);
+            return !!this.rat;
         }
         isEmpty() {
-            return this.rats.every(r => !r);
+            return !this.rat;
         }
 
         pushRat(rat) {
-            const firstEmptyIndex = this.rats.findIndex(rat => rat === null);
-            if (rat && firstEmptyIndex >= 0) {
-                this.rats[firstEmptyIndex] = rat.setPos({x: this.X + firstEmptyIndex, y: this.Y});
+            if (rat && !this.rat) {
+                this.rat = rat.setPos({x: this.X, y: this.Y});
+                this.timer = 0;
                 return true;
             } else {
                 return false;
@@ -180,34 +205,18 @@
         }
 
         update() {
-
-            const trueRats = this.rats.filter( rat => !!rat);
-
-            // infecting
-            const numOfInfetedRats = trueRats.reduce((sum, rat) => sum += (rat.infected ? 1 : 0), 0);
-            if (numOfInfetedRats > 0) {
-                trueRats.forEach(rat => {
-                    if (!rat.infected) {
-                        rat.infected = true;
-                        this.numOfInfetcions++;
-                    }
-                });
-            }
-
-            // healing
-            this.rats.forEach((rat, index) => {
-                if (rat) {
-                    rat.heal();
-                    if (!rat.isIll()) {
-                        this.rats[index] = null;
-                        rat.destroy();
-                    }
+            if (this.rat) {
+                if (this.timer >= 1) {
+                    this.rat.destroy();
+                    this.rat = null;
+                    this.timer = 0;
+                } else {
+                    this.timer++;
                 }
-            });
+            }
         }
-
         destroy() {
-            this.rats.forEach(rat => rat && rat.destroy());
+            this.rat && this.rat.destroy();
         }
     }
 
@@ -222,7 +231,8 @@
             document.getElementById('average').onclick = () => this.calculateAverage(1000);
 
             this.rules = [
-                () => this.rooms.reduce((sum, room) => sum - room.numOfInfetcions, 0)
+                () => this.hall.numOfDeaths
+
                 /*
                 () => this.rooms[ROOM.UNDERGROUND_GARAGE].rats
                     .reduce((sum, rat, position) => sum + (rat.type === RAT.MANAGER && position >= 20 ? 10 : 0), 0),
@@ -246,8 +256,8 @@
                 this.street.destroy();
             if (this.hall)
                 this.hall.destroy();
-            if (this.rooms) {
-                this.rooms.forEach(room => room.destroy());
+            if (this.surgeries) {
+                this.surgeries.forEach(surgery => surgery.destroy());
             }
 
             this.street = new Street(-6, 6);
@@ -259,10 +269,10 @@
 
             this.hall = new Hall(5,8, 6);
 
-            this.rooms = [
-                new Room(1, 7, 4),
-                new Room(2, 10, 4),
-                new Room(3, 9, 2),
+            this.surgeries = [
+                new Surgery(7, 4),
+                new Surgery(10, 4),
+                new Surgery(9, 2)
             ];
 
             this.speed = undefined;
@@ -298,10 +308,13 @@
         run(speed) {
             const stopped = this.speed === undefined;
             this.speed = speed;
+
+            if (this.speed === undefined) {
+                this.updateUI(true );
+            }
             if (stopped) {
                 this.doAStep();
             }
-
         }
 
         calculateScores() {
@@ -309,20 +322,25 @@
         }
 
         updateUI(doContinue, scores, numOfRounds) {
-            const total = scores.reduce((sum, score) => sum + score, 0);
 
             document.getElementById('rounds').innerHTML = numOfRounds ? `(${numOfRounds} rounds)` : '';
 
-            document.getElementById('score1').innerHTML = numOfRounds ? parseFloat(scores[0]).toFixed(2) : scores[0];
-            //document.getElementById('score2').innerHTML = numOfRounds ? parseFloat(scores[1]).toFixed(2) : scores[1];
-            //document.getElementById('score3').innerHTML = numOfRounds ? parseFloat(scores[2]).toFixed(2) : scores[2];
-            document.getElementById('totalScore').innerHTML = numOfRounds ? parseFloat(total).toFixed(2) : total;
+            if (scores) {
+                const total = scores.reduce((sum, score) => sum + score, 0);
+                document.getElementById('score1').innerHTML = numOfRounds ? parseFloat(scores[0]).toFixed(2) : scores[0];
+                //document.getElementById('score2').innerHTML = numOfRounds ? parseFloat(scores[1]).toFixed(2) : scores[1];
+                //document.getElementById('score3').innerHTML = numOfRounds ? parseFloat(scores[2]).toFixed(2) : scores[2];
+                document.getElementById('totalScore').innerHTML = numOfRounds ? parseFloat(total).toFixed(2) : total;
+            }
 
+            document.getElementById('step').disabled = !doContinue || this.speed;
             document.getElementById('slow-run').disabled = !doContinue;
             document.getElementById('fast-run').disabled = !doContinue;
             document.getElementById('instant-run').disabled = !doContinue;
             document.getElementById('pause').disabled = !doContinue || this.speed === undefined;
             document.getElementById('reset').disabled = this.street.rats.length === 100;
+
+            console.log('SPEED', this.speed);
         }
 
 
@@ -331,32 +349,33 @@
             let doContinue = false;
             if (force || SILENT_MODE || this.speed !== undefined) {
                 try {
-                    const result = this.erManager.redirectRatToRoom();
+                    const result = this.erManager.redirectRatToSurgery();
 
                     if (result
                         && result.rat >= 1 && result.rat <= 5
-                        && result.room >= 1 && result.room  <= 5) {
+                        && result.surgery >= 1 && result.surgery  <= 3) {
 
-                        console.log(`Redirecting rat #${result.rat} to room #${result.room}`);
+                        console.log(`Redirecting rat #${result.rat} to surgery #${result.surgery}`);
 
-                        // ROOM -> OUT
+                        // UPDATES
 
-                        this.rooms.forEach(room => room.update());
+                        this.hall.update();
+                        this.surgeries.forEach(surgery => surgery.update());
 
-                        // HALL -> ROOM
+                        // HALL -> SURGERY
 
                         {
                             const ratIndex = result.rat-1;
-                            const room = this.rooms[result.room-1];
+                            const surgery = this.surgeries[result.surgery-1];
 
                             if (!this.hall.hasRat(ratIndex)) {
                                 console.log(`No rat is sitting at position #${result.rat}!`);
                             }
-                            else if (room.isFull()) {
-                                console.log(`Room #${result.room} is full!`);
+                            else if (surgery.isFull()) {
+                                console.log(`Surgery #${result.surgery} is full!`);
                             } else {
                                 const rat = this.hall.pickRat(ratIndex);
-                                room.pushRat(rat);
+                                surgery.pushRat(rat);
                             }
                         }
 
@@ -376,7 +395,7 @@
 
                         // NEXT STEP
                         const empty = this.street.isEmpty() && this.hall.isEmpty()
-                            && this.rooms.every(room => room.isEmpty());
+                            && this.surgeries.every(surgery => surgery.isEmpty());
 
                         doContinue = !empty;
 
@@ -392,7 +411,7 @@
                     }
 
                 } catch (e) {
-                    console.error('erManager.redirectRatToRoom() crashed.', e);
+                    console.error('erManager.redirectRatToSurgery() crashed.', e);
                     this.reset();
                 }
                 if (!SILENT_MODE) {
