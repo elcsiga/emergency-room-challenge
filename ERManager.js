@@ -41,7 +41,7 @@ class ERManager {
 
         // As an example, here we send a random rat to a random Surgery:
         // You can do it better...
-        
+
         const rat = Math.floor(Math.random() * 5);
         const surgery = Math.floor(Math.random() * 3);
         return { rat, surgery };
