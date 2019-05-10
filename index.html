@@ -8,7 +8,7 @@
         <title>The Ultimate Emergency Room Challenge</title>
     </head>
     <body>
-        <h1>The Ultimate Emergency Room Challenge</h1>
+        <h1>The Emergency Room Challenge</h1>
         <div id="board"></div>
 
         <div>
@@ -21,11 +21,20 @@
             <button id="average"> <i class="fas fa-chart-line"></i> </button>
         </div>
 
+
+
+        <table>
+            <tr><th> Room <th> Black rats healed <th> White rats healed <th> Infections </tr>
+            <tr><td> Dr. Rabbit <td id="black0"> <td id="white0"> <td id="infection0"> </tr>
+            <tr><td> Dr. Fox <td id="black1"> <td id="white1"> <td id="infection1"> </tr>
+            <tr><td> Dr. Snake <td id="black2"> <td id="white2"> <td id="infection2"> </tr>
+        </table>
+
         <div id="scores">
             <b>SCORE <span id="rounds"></span>:</b>
-            Managers: <span id="score1"></span> -
-            Disableds: <span id="score2"></span> -
-            Employees: <span id="score3"></span> -
+            Timeout: <span id="score1"></span> -
+            Infection: <span id="score2"></span> -
+            Discrimination: <span id="score3"></span> -
             Total: <span id="totalScore"></span>
         </div>
 
@@ -33,70 +42,89 @@
             <h2>TL;DR</h2>
             <p>
                 Write Javascript code to manage the emergency room.
+                Try to avoid timeouts, infections and discrimination.
+                Collect as less penalty points as poosible.
             </p>
         </section>
 
         <section>
-            <h2>Rules</h2>
+
+            <h2>Triage</h2>
+            <p>
+                Rats get examined at the entrance and receive a triage number from 1 to 10.
+            </p>
+            <p>
+                The number means that you have to send the rat into one of the surgery
+                rooms within the given time. Lower numbers represent a more urgent situation
+                than higher ones.
+            </p>
+            <p>
+                <img src="game/legend/legend_signs.png">
+            </p>
+            <p>
+
+                If the rat remains in the hall over that time it will die
+                and your <b>Timeout</b> score will increase.
+                Black signs in the hall represent the remaining time (in steps).
+            </p>
+
+            <h2>
+                Dr. Rabbit, Dr. Fox and Dr. Snake
+            </h2>
+
+            <p>
+                <img class="rat" src="game/legend/legend_rabbit.png">
+                Healing a rat takes <b>2</b> steps for Mr. Rabbit.
+            </p>
+            <p>
+                <img class="rat" src="game/legend/legend_fox.png">
+                Healing a rat takes <b>3</b> steps for Mr. Fox.
+            </p>
+            <p>
+                <img class="rat" src="game/legend/legend_snake.png">
+                Healing a rat takes <b>5</b> steps for Mr. Snake.
+            <p>
+
+
+
+            <h2>
+                Black rat, white rat
+            </h2>
 
             <p>
 
-            </p>
-
-            <p>
-                <img class="legend2" src="game/background/legend-disabled.png">
-                <img class="car" src="game/rats/rat.png"> 30 of them are <b>infectious</b>.
-                You can call these patients into any rooms.
-
-                But be careful! An infectious patient will infect all other patient inside a room.
-                Each new infection.
-            </p>
-
-
-            <h2>Rules</h2>
-            <p>
-                You are the Staff Executive Parking Manager at Váci Greens.
-                Every morning <b>100 cars arrive</b>, you have to redirect them
-                into one of the 3 parking lots with 30-30-30 parking spaces.
+                Things are not black and white, however rats are.
+                Moreover, black rats are <i>infectious</i>!
             </p>
             <p>
-                <img class="legend1" src="game/background/legend-manager.png">
-                <img class="car" src="game/rats/rat.png"> 20 of them are <b>managers</b>.
-                Every manager who gets into the <b>upper floor
-                of the underground garage</b> means <b>10 points</b> for you.
-                You do not receive points for parking on an other floor
-                or overground.
+                If a white and a black rat meet in the big surgery room
+                on the first floor, the black rat will infect the white one.
             </p>
             <p>
-                <img class="legend2" src="game/background/legend-disabled.png">
-                <img class="car" src="game/rats/rat.png"> 30 of them are <b>disabled</b>.
-                They prefer parking spaces <b>near the entrance
-                in the overground parking lots</b>.
-                You can receive <b>1 to 10 points</b>, 10 points for the first,
-                1 point for the 10th parking place, in the order of arrivals.
-                If they have to park farther or underground,
-                you do not receive points.
+                <img class="legend" src="game/legend/legend_infection.png">
             </p>
             <p>
-                <img class="car" src="game/rats/rat.png"> The rest, <b>employees</b>.
-                are simple: you gain <b>2 points</b> for each of them
-                who can park in any place.
+                The white rat will die and your <b>Infection</b> score
+                will increase.
+            </p>
+            <p>
+                Infection can happen in the big surgery room
+                on the first floor only, but never in the small room in the attic.
             </p>
 
-            <ul>
-                <li>
-                    Write plain Javascript (ES6) code,
-                    do not use any framework or library.
-                </li>
-                <li>
-                    Your code MUST always choose a parking lot for each car.
-                    If you send a car into a parking lot which is full,
-                    that car won't park, it will go away.
-                </li>
-                <li>
-                    Your code MUST never throw an error or exception.
-                </li>
-            </ul>
+            <h2>
+                Equal opportunity
+                <img class="rat" src="game/rats/rat_black.png">
+                <img class="rat" src="game/rats/rat.png">
+            </h2>
+
+            <p>
+                Do not discriminate rats based on their color!
+                Try to heal equal number as many black rats as white ones.
+                The difference will result as <b>Discrimination</b> poinrs in your score.
+            </p>
+
+
         </section>
 
         <section>
@@ -109,6 +137,21 @@
                 Open <code>ERManager.js</code> and write code.
                 Test your code by opening <code>index.html</code> in your browser.
             </p>
+
+
+            <ul>
+                <li>
+                    Write plain Javascript (ES6) code,
+                    do not use any framework or library.
+                </li>
+                <li>
+                    Your code MUST never throw an error or exception.
+                </li>
+                <li>
+                    See more instructions in the <code>ERManager.js</code> file.
+                </li>
+            </ul>
+
         </section>
 		
 		<!--

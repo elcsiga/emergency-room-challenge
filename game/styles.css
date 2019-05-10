@@ -1,6 +1,6 @@
 body {
-    --rat-width: 50px;
-    --rat-height: 50px;
+    --rat-width: 60px;
+    --rat-height: 60px;
 
     font-family: 'Josefin Slab', serif;
     width: 100%;
@@ -18,7 +18,7 @@ body {
 }
 
 #board {
-    width: calc( var(--rat-width) * 14);
+    width: calc( var(--rat-width) * 11);
     height: calc( var(--rat-height) * 8 );
     background-color: grey;
     position: relative;
@@ -34,6 +34,19 @@ body {
     height: var(--rat-width);
     transition: transform .3s, opacity 1s;
 }
+#board > div {
+    position: absolute;
+    top: calc( var(--rat-height) * 8 );
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    font-weight: bolder;
+    font-size: 14px;
+    font-family: "Arial Black";
+    color: white;
+}
+
 h1 {
     margin-top: 80px;
 }
@@ -55,7 +68,8 @@ button:hover {
     background-color: lightgray;
 }
 #scores {
-    margin-bottom: 100px;
+    margin-bottom: 50px;
+    font-size: 24px;
 }
 #scores span {
     font-weight: bold;
@@ -69,20 +83,7 @@ section {
 section ul {
     margin: 50px 0;
 }
-section .car {
-    width: 60px;
-    vertical-align: bottom;
-}
-section .legend1, section .legend2 {
-    float: right;
-    margin: 30px 10px 10px 10px;
-}
-section .legend1 {
-    width: 40%;
-}
-section .legend2 {
-    width: 60%;
-}
+
 #progress {
 	display: none;
 	position: fixed;
@@ -95,4 +96,18 @@ section .legend2 {
 	text-align: center;
 	line-height: 100vh;
 	font-size: 40px;
+}
+
+table {
+    margin: 30px 0;
+}
+td, th {
+    border-bottom: 1px solid black;
+    margin: 0;
+    padding: 5px 15px;
+    text-align: center;
+}
+.rat {
+    width: 60px;
+    vertical-align: bottom;
 }
