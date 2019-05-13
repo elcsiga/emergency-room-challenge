@@ -45,25 +45,6 @@ class ERManager {
         const rat = Math.floor(Math.random() * 5);
         const surgery = Math.floor(Math.random() * 3);
         return { rat, surgery };
-
-        /*
-
-        PRÓBAKÉPP: LEGSÜRGŐSEBB ESET A SZABAD SZOBÁBA
-        EZ NEM LESZ BENNE A FELADATBAN
-
-        let i = 0;
-        let minT = 100;
-        report.ratsInTheHall.forEach((rat, index) => {
-            if (rat && rat.remainingTime < minT) {
-                minT = rat.remainingTime;
-                i = index;
-            }
-        });
-        const s = report.surgeriesOccupied.findIndex(s => !s);
-        return { rat: i, surgery: s < 0 ? 0 : s };
-
-        */
-
     }
 }
 
