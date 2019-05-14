@@ -22,13 +22,14 @@ class ERManager {
     //  The function receives a report about the current state of things like this:
     //  {
     //    ratsInTheHall: [
-    //      {remainingTime: 5, isBlack: false},
+    //      {remainingTime: 5, isBlack: false},   // remainingTime will decrease in each step
     //      {remainingTime: 10, isBlack: false},
     //      {remainingTime: 5, isBlack: true},
-    //      null,
+    //      null,                                 // no rat on this position
     //      {remainingTime: 1, isBlack: false}
     //    ],
-    //    surgeriesOccupied: [ true, true, false ]
+    //    timeUntilSurgeryWillBeFree: [ 0, 2, 1 ] // for A,B and C surgery rooms,
+    //                                            // 0 means that the room is empty
     //  }
     //
     //  You have to return with an object, which redirects one rat into one surgery room

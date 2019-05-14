@@ -111,3 +111,17 @@ td, th {
     width: 60px;
     vertical-align: bottom;
 }
+
+
+
+.doctors {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: flex-end;
+
+}
+.doctors p {
+    margin: 0 20px;
+    text-align: center;
+}

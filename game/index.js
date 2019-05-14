@@ -11,18 +11,10 @@
     const RAT_WIDTH = parseInt(getComputedStyle(document.body).getPropertyValue('--rat-width'));
     const RAT_HEIGHT = parseInt(getComputedStyle(document.body).getPropertyValue('--rat-height'));
 
-    Array.prototype.shuffle = function () {
-        for (let i = this.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [this[i], this[j]] = [this[j], this[i]];
-        }
-        return this;
-    };
-
     class Rat {
         constructor() {
             this.infected = Math.random() > .5;
-            this.triage = Math.floor(Math.random() * 10) + 1;
+            this.triage = Math.floor(Math.random() * 10) + 2;
             if (!SILENT_MODE) {
                 this.img = document.createElement("img");
                 this.img.src = this.infected ? `game/rats/rat_black.png` : `game/rats/rat.png`;
@@ -380,8 +372,10 @@
                             remainingTime: rat.triage,
                             isBlack: rat.infected
                         } : null),
-                        surgeriesOccupied: this.surgeries.map(surgery => !!surgery.rat)
+                        timeUntilSurgeryWillBeFree: this.surgeries.map(surgery => surgery.rat ? surgery.time-surgery.timer : 0)
                     };
+
+                    this.surgeries.forEach(surgery => surgery.update());
 
                     const result = this.erManager.redirectRatToSurgery(report);
 
@@ -390,11 +384,6 @@
                         && result.surgery >= 0 && result.surgery <= 2) {
 
                         log(`Redirecting rat #${result.rat} to surgery #${result.surgery}`);
-
-                        // UPDATES
-
-                        this.hall.update();
-                        this.surgeries.forEach(surgery => surgery.update());
 
                         // HALL -> SURGERY
                         {
@@ -423,6 +412,8 @@
                                 this.hall.pushRat(rat);
                             }
                         }
+
+                        this.hall.update();
 
                         this.hall.updateSigns();
 

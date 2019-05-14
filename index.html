@@ -5,7 +5,8 @@
         <link rel="stylesheet" type="text/css" href="game/styles.css">
         <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:400,700" rel="stylesheet">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-        <title>The Ultimate Emergency Room Challenge</title>
+        <link rel="icon" type="image/png" href="rats/rat.png" />
+        <title>The Emergency Room Challenge</title>
     </head>
     <body>
         <h1>The Emergency Room Challenge</h1>
@@ -45,7 +46,7 @@
             <p>
                 Write Javascript code to manage the emergency room.
                 Try to avoid timeouts, infections and discrimination.
-                Collect as less penalty points as poosible.
+                Collect as less penalty points as possible.
             </p>
         </section>
 
@@ -53,6 +54,7 @@
 
             <h2>Triage</h2>
             <p>
+                Each day 100 rats arrive at the Rat City Hospital.
                 Rats get examined at the entrance and receive a triage number from 1 to 10.
             </p>
             <p>
@@ -74,18 +76,24 @@
                 Dr. Rabbit, Dr. Fox and Dr. Snake
             </h2>
 
-            <p>
-                <img class="rat" src="game/legend/legend_rabbit.png">
-                Healing a rat takes <b>2</b> steps for Mr. Rabbit.
-            </p>
-            <p>
-                <img class="rat" src="game/legend/legend_fox.png">
-                Healing a rat takes <b>3</b> steps for Mr. Fox.
-            </p>
-            <p>
-                <img class="rat" src="game/legend/legend_snake.png">
-                Healing a rat takes <b>5</b> steps for Mr. Snake.
-            <p>
+            <div class="doctors">
+                <p>
+                    <img class="rat" src="game/legend/legend_rabbit.png">
+                    <br/><br/>
+                    In room [A] healing a rat takes <b>2</b> steps for Mr. Rabbit.
+                </p>
+                <p>
+                    <img class="rat" src="game/legend/legend_fox.png">
+                    <br/><br/>
+                    In room [B] Healing a rat takes <b>3</b> steps for Mr. Fox.
+                </p>
+                <p>
+                    <img class="rat" src="game/legend/legend_snake.png">
+                    <br/>
+                    In room [C] Healing a rat takes <b>5</b> steps for Mr. Snake.
+                <p>
+            </div>
+
 
 
 
@@ -121,9 +129,10 @@
             </h2>
 
             <p>
+                50% of the rats are black.
                 Do not discriminate rats based on their color!
                 Try to heal as many black rats as white ones.
-                The difference will result as <b>Discrimination</b> poinrs in your score.
+                The difference will result in <b>Discrimination</b> points in your score.
             </p>
 
 
@@ -139,10 +148,9 @@
                 Open <code>
 			<a href="https://github.com/elcsiga/emergency-room-challenge/blob/master/ERManager.js">
 				ERManager.js
-			</a></code and write code.
+			</a></code> and write code.
                 Test your code by opening <code>index.html</code> in your browser.
             </p>
-
 
             <ul>
                 <li>
