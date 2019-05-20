@@ -38,13 +38,57 @@ class ERManager {
     //  You MUST always return a valid response. If there is no rat in the given
     //  position or the given surgery room is occupied, the rat will remain in the hall.
 
+
+    getNextRatId(freeMedTime, param) {
+        let minMedTime = 100;
+        let selectedRat = 0;
+        for (let i = 0; i < param.length; ++i) {
+            if (null === param[i]) {
+                continue;
+            }
+            if (param[i].remainingTime < minMedTime && param[i].remainingTime >= freeMedTime) {
+                minMedTime = param[i].remainingTime;
+                selectedRat = i;
+            }
+        }
+        return selectedRat;
+    }
+
+    getFirstFreeMed(param) {
+        let result = 0;
+
+        for (let freeMed = 0; freeMed < param.length; ++freeMed) {
+            if (0 === param[freeMed]) {
+                result = freeMed;
+            }
+        }
+        return result;
+    }
+
+    cleanRatColor(param) {
+        for (let j = 0; j < param.length; j++) {
+            if (0 == param[j]) {
+                this.ratColor[j] = null;
+            }
+        }
+    }
+
+    ratColor = [null, null, null];
+
     redirectRatToSurgery(report) {
 
-        // As an example, here we send a random rat to a random Surgery:
-        // You can do it better...
+        const medTime = [2, 3, 5];
 
-        const rat = Math.floor(Math.random() * 5);
-        const surgery = Math.floor(Math.random() * 3);
+        this.cleanRatColor(report.timeUntilSurgeryWillBeFree);
+
+        let surgery = this.getFirstFreeMed(report.timeUntilSurgeryWillBeFree);
+
+        const rat = this.getNextRatId(medTime[surgery], report.ratsInTheHall);
+
+        if (report.ratsInTheHall[rat]) {
+            this.ratColor[surgery] = report.ratsInTheHall[rat].isBlack;
+        }
+
         return { rat, surgery };
     }
 }
